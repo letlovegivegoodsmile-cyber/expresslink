@@ -1,39 +1,46 @@
+import { useState } from "react";
+import { useNavigate } from "react-router";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-
-function getOAuthUrl() {
-  const kimiAuthUrl = import.meta.env.VITE_KIMI_AUTH_URL;
-  const appID = import.meta.env.VITE_APP_ID;
-  const redirectUri = `${window.location.origin}/api/oauth/callback`;
-  const state = btoa(redirectUri);
-
-  const url = new URL(`${kimiAuthUrl}/api/oauth/authorize`);
-  url.searchParams.set("client_id", appID);
-  url.searchParams.set("redirect_uri", redirectUri);
-  url.searchParams.set("response_type", "code");
-  url.searchParams.set("scope", "profile");
-  url.searchParams.set("state", state);
-
-  return url.toString();
-}
+import { trpc } from "@/providers/trpc";
 
 export default function Login() {
+  const navigate = useNavigate();
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const login = trpc.auth.login.useMutation({
+    onSuccess: () => navigate("/admin"),
+    onError: () => setError("Wrong password"),
+  });
+
   return (
     <div className="min-h-screen flex items-center justify-center">
       <Card className="w-full max-w-sm">
         <CardHeader className="text-center">
-          <CardTitle>Welcome</CardTitle>
+          <CardTitle>Staff login</CardTitle>
         </CardHeader>
         <CardContent>
-          <Button
-            className="w-full"
-            size="lg"
-            onClick={() => {
-              window.location.href = getOAuthUrl();
+          <form
+            className="space-y-3"
+            onSubmit={(e) => {
+              e.preventDefault();
+              setError("");
+              login.mutate({ password });
             }}
           >
-            Sign in with Kimi
-          </Button>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
+              className="w-full rounded-md border px-3 py-2"
+              autoComplete="current-password"
+            />
+            {error ? <p className="text-sm text-red-600">{error}</p> : null}
+            <Button className="w-full" size="lg" type="submit" disabled={login.isPending}>
+              Sign in
+            </Button>
+          </form>
         </CardContent>
       </Card>
     </div>
