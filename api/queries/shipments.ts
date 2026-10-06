@@ -32,6 +32,10 @@ export async function createShipment(data: {
   destination: string;
   mode: string;
   eta?: string;
+    goods?: string;
+  deliveryAddress?: string;
+  amount?: string;
+  deliveryTime?: string;
 }): Promise<ShipmentWithEvents> {
   const db = getDb();
   const [{ id }] = await db
