@@ -61,6 +61,10 @@ export const shipments = mysqlTable("shipments", {
   ])
     .default("pending")
     .notNull(),
+  goods: text("goods"),
+deliveryAddress: varchar("deliveryAddress", { length: 500 }),
+amount: varchar("amount", { length: 64 }),
+deliveryTime: varchar("deliveryTime", { length: 64 }),
   eta: varchar("eta", { length: 64 }),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt")
