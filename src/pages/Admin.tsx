@@ -170,7 +170,7 @@ function NewShipmentDialog() {
         description: "Give this tracking number to the customer.",
       });
       setOpen(false);
-      setForm({ customerName: "", origin: "", destination: "", mode: "Ground transport", eta: "" });
+                setForm({ customerName: "", origin: "", destination: "", mode: "Ground transport", eta: "", goods: "", deliveryAddress: "", amount: "", deliveryTime: "" });
     },
     onError: (e) => toast.error(e.message),
   });
@@ -196,6 +196,10 @@ function NewShipmentDialog() {
               destination: form.destination,
               mode: form.mode,
               eta: form.eta || undefined,
+                            goods: form.goods || undefined,
+              deliveryAddress: form.deliveryAddress || undefined,
+              amount: form.amount || undefined,
+              deliveryTime: form.deliveryTime || undefined,
             });
           }}
         >
@@ -255,6 +259,44 @@ function NewShipmentDialog() {
                 placeholder="Oct 12"
                 value={form.eta}
                 onChange={(e) => setForm({ ...form, eta: e.target.value })}
+              />
+            </div>
+          </div>
+                    <div className="grid gap-2">
+            <Label htmlFor="nsGoods">Goods</Label>
+            <Input
+              id="nsGoods"
+              placeholder="What is being shipped"
+              value={form.goods}
+              onChange={(e) => setForm({ ...form, goods: e.target.value })}
+            />
+          </div>
+          <div className="grid gap-2">
+            <Label htmlFor="nsAddress">Delivery address</Label>
+            <Input
+              id="nsAddress"
+              placeholder="Street, city"
+              value={form.deliveryAddress}
+              onChange={(e) => setForm({ ...form, deliveryAddress: e.target.value })}
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="grid gap-2">
+              <Label htmlFor="nsAmount">Amount</Label>
+              <Input
+                id="nsAmount"
+                placeholder="100"
+                value={form.amount}
+                onChange={(e) => setForm({ ...form, amount: e.target.value })}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="nsTime">Delivery time</Label>
+              <Input
+                id="nsTime"
+                placeholder="2026-10-10 15:00"
+                value={form.deliveryTime}
+                onChange={(e) => setForm({ ...form, deliveryTime: e.target.value })}
               />
             </div>
           </div>
