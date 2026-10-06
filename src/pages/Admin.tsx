@@ -158,6 +158,10 @@ function NewShipmentDialog() {
     destination: "",
     mode: "Ground transport",
     eta: "",
+       goods: "",
+    deliveryAddress: "",
+    amount: "",
+    deliveryTime: "", 
   });
   const create = trpc.shipments.create.useMutation({
     onSuccess: (s) => {
