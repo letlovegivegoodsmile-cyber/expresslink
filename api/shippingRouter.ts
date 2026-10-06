@@ -81,6 +81,10 @@ export const shipmentsRouter = createRouter({
         destination: z.string().trim().min(2).max(255),
         mode: z.string().trim().min(2).max(64),
         eta: z.string().trim().max(64).optional(),
+                goods: z.string().trim().max(5000).optional(),
+        deliveryAddress: z.string().trim().max(500).optional(),
+        amount: z.string().trim().max(64).optional(),
+        deliveryTime: z.string().trim().max(64).optional(),
       }),
     )
     .mutation(async ({ input }) => {
