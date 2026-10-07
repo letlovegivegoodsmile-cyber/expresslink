@@ -1047,3 +1047,12 @@ body.is-loaded .ell .reveal-hero:nth-of-type(3) { transition-delay: 0.34s; }
   .ell .ticker-track { animation: none !important; }
   .ell .scroll-hint span { animation: none !important; }
 }
+
+
+.track-events {
+  position: relative;
+  margin-top: 24px;
+  padding-left: 28px;
+  border-left: 3px solid orange;
+  text-align: left;
+}
