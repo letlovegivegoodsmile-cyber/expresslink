@@ -1,4 +1,4 @@
-import { useState } from "react";
+fimport { useState } from "react";
 import { trpc } from "@/providers/trpc";
 import { Stars } from "@/components/site/Stars";
 import {
@@ -100,19 +100,11 @@ function TrackWidget() {
               {result.eta ? ` · ETA ${result.eta}` : ""}
             </span>
           </div>
-          <ol className="track-timeline">
-            {SHIPMENT_STATUSES.map((s, i) => (
-              <li key={s} className={i < doneCount ? "is-done" : ""}>
-                <i></i>
-                <span>{SHIPMENT_STATUS_LABELS[s]}</span>
-              </li>
-            ))}
-          </ol>
           {result.events.length > 0 && (
             <div className="track-events">
               {[...result.events]
                 .reverse()
-                .slice(0, 3)
+                .slice(0, 20)
                 .map((ev) => (
                   <div className="track-event" key={ev.id}>
                     <time>
