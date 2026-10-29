@@ -1,48 +1,52 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { trpc } from "@/providers/trpc";
+import { trpc } from "@/lib/trpc"; 
 
 export default function Login() {
-  const navigate = useNavigate();
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const login = trpc.auth.login.useMutation({
-    onSuccess: () => navigate("/admin"),
-    onError: () => setError("Wrong password"),
+  const navigate = useNavigate();
+  
+  const loginMutation = trpc.auth.login.useMutation({
+    onSuccess: () => {
+      // On success, redirect to the admin dashboard
+      navigate("/admin");
+    },
+    onError: (err) => {
+      alert("Login failed: " + err.message);
+    },
   });
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <Card className="w-full max-w-sm">
-        <CardHeader className="text-center">
-          <CardTitle>Staff login</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form
-            className="space-y-3"
-            onSubmit={(e) => {
-              e.preventDefault();
-              setError("");
-              login.mutate({ password });
-            }}
-          >
+    <div className="flex h-screen items-center justify-center bg-gray-100">
+      <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-md">
+        <h1 className="text-2xl font-bold mb-6 text-center text-gray-800">Admin Login</h1>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            loginMutation.mutate({ password });
+          }}
+          className="space-y-4"
+        >
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Admin Password</label>
             <input
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password"
-              className="w-full rounded-md border px-3 py-2"
-              autoComplete="current-password"
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none"
+              placeholder="Enter password..."
+              required
             />
-            {error ? <p className="text-sm text-red-600">{error}</p> : null}
-            <Button className="w-full" size="lg" type="submit" disabled={login.isPending}>
-              Sign in
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+          </div>
+          <button
+            type="submit"
+            disabled={loginMutation.isPending}
+            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:opacity-50"
+          >
+            {loginMutation.isPending ? "Logging in..." : "Login"}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
