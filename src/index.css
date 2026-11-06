@@ -1,4 +1,16 @@
-/* --- PASTE THIS AT THE VERY BOTTOM OF index.css --- */
+/* ... your existing code above ... */
+
+.track-events {
+  position: relative;
+  margin-top: 24px;
+  padding-left: 28px;
+  border-left: 3px solid orange;
+  text-align: left;
+}
+
+/* ============================================================ */
+/* --- PASTE THE NEW CODE BELOW THIS LINE --- */
+/* ============================================================ */
 
 .table-title {
   background-color: #1a2a44;
