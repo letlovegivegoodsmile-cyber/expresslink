@@ -152,17 +152,34 @@ function QuotesTab() {
 function NewShipmentDialog() {
   const utils = trpc.useUtils();
   const [open, setOpen] = useState(false);
+  
   const [form, setForm] = useState({
     customerName: "",
     origin: "",
     destination: "",
-    mode: "Ground transport",
+    mode: "Air freight (flight)",
     eta: "",
-       goods: "",
+    goods: "",
     deliveryAddress: "",
     amount: "",
-    deliveryTime: "", 
+    deliveryTime: "",
+    modeOfTransport: "",
+    departureAirport: "",
+    destinationAirport: "",
+    finalDeliveryAddress: "",
+    consigneeEori: "",
+    vehicleName: "",
+    vehicleVin: "",
+    vehicleHsCode: "",
+    vehicleOrigin: "",
+    goldInvestment: "",
+    goldJewelry: "",
+    customsTariffNo: "",
+    exactWeight: "",
+    declaredValue: "",
+    paymentStatus: "",
   });
+
   const create = trpc.shipments.create.useMutation({
     onSuccess: (s) => {
       utils.shipments.list.invalidate();
@@ -170,10 +187,53 @@ function NewShipmentDialog() {
         description: "Give this tracking number to the customer.",
       });
       setOpen(false);
-                setForm({ customerName: "", origin: "", destination: "", mode: "Ground transport", eta: "", goods: "", deliveryAddress: "", amount: "", deliveryTime: "" });
+      setForm({ 
+        customerName: "", origin: "", destination: "", mode: "Air freight (flight)", eta: "", goods: "", deliveryAddress: "", amount: "", deliveryTime: "",
+        modeOfTransport: "", departureAirport: "", destinationAirport: "", finalDeliveryAddress: "", consigneeEori: "",
+        vehicleName: "", vehicleVin: "", vehicleHsCode: "", vehicleOrigin: "",
+        goldInvestment: "", goldJewelry: "", customsTariffNo: "", exactWeight: "", declaredValue: "", paymentStatus: ""
+      });
     },
     onError: (e) => toast.error(e.message),
   });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    let vehiclesArray = undefined;
+    if (form.vehicleName) {
+      vehiclesArray = [{
+        vehicle: form.vehicleName,
+        vin: form.vehicleVin,
+        hsCode: form.vehicleHsCode,
+        origin: form.vehicleOrigin
+      }];
+    }
+
+    create.mutate({
+      customerName: form.customerName || undefined,
+      origin: form.origin,
+      destination: form.destination,
+      mode: form.mode,
+      eta: form.eta || undefined,
+      goods: form.goods || undefined,
+      deliveryAddress: form.deliveryAddress || undefined,
+      amount: form.amount || undefined,
+      deliveryTime: form.deliveryTime || undefined,
+      modeOfTransport: form.modeOfTransport || undefined,
+      departureAirport: form.departureAirport || undefined,
+      destinationAirport: form.destinationAirport || undefined,
+      finalDeliveryAddress: form.finalDeliveryAddress || undefined,
+      consigneeEori: form.consigneeEori || undefined,
+      vehicles: vehiclesArray,
+      goldInvestment: form.goldInvestment || undefined,
+      goldJewelry: form.goldJewelry || undefined,
+      customsTariffNo: form.customsTariffNo || undefined,
+      exactWeight: form.exactWeight || undefined,
+      declaredValue: form.declaredValue || undefined,
+      paymentStatus: form.paymentStatus || undefined,
+    });
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -182,125 +242,146 @@ function NewShipmentDialog() {
           <Plus className="h-4 w-4 mr-1" /> New shipment
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Create shipment</DialogTitle>
         </DialogHeader>
-        <form
-          className="grid gap-4 pt-2"
-          onSubmit={(e) => {
-            e.preventDefault();
-            create.mutate({
-              customerName: form.customerName || undefined,
-              origin: form.origin,
-              destination: form.destination,
-              mode: form.mode,
-              eta: form.eta || undefined,
-                            goods: form.goods || undefined,
-              deliveryAddress: form.deliveryAddress || undefined,
-              amount: form.amount || undefined,
-              deliveryTime: form.deliveryTime || undefined,
-            });
-          }}
-        >
+        
+        <form className="grid gap-6 pt-2" onSubmit={handleSubmit}>
+          
           <div className="grid gap-2">
             <Label htmlFor="nsCustomer">Customer name (optional)</Label>
-            <Input
-              id="nsCustomer"
-              value={form.customerName}
-              onChange={(e) => setForm({ ...form, customerName: e.target.value })}
-            />
+            <Input id="nsCustomer" value={form.customerName} onChange={(e) => setForm({ ...form, customerName: e.target.value })} />
           </div>
+          
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
               <Label htmlFor="nsOrigin">Origin *</Label>
-              <Input
-                id="nsOrigin"
-                required
-                placeholder="Dallas, TX"
-                value={form.origin}
-                onChange={(e) => setForm({ ...form, origin: e.target.value })}
-              />
+              <Input id="nsOrigin" required placeholder="Dallas, TX" value={form.origin} onChange={(e) => setForm({ ...form, origin: e.target.value })} />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="nsDest">Destination *</Label>
-              <Input
-                id="nsDest"
-                required
-                placeholder="Rotterdam, NL"
-                value={form.destination}
-                onChange={(e) => setForm({ ...form, destination: e.target.value })}
-              />
+              <Input id="nsDest" required placeholder="Rotterdam, NL" value={form.destination} onChange={(e) => setForm({ ...form, destination: e.target.value })} />
             </div>
           </div>
+
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
               <Label>Mode</Label>
-              <Select
-                value={form.mode}
-                onValueChange={(v) => setForm({ ...form, mode: v })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
+              <Select value={form.mode} onValueChange={(v) => setForm({ ...form, mode: v })}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
                   {FREIGHT_MODES.slice(0, 4).map((m) => (
-                    <SelectItem key={m} value={m}>
-                      {m}
-                    </SelectItem>
+                    <SelectItem key={m} value={m}>{m}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
             <div className="grid gap-2">
               <Label htmlFor="nsEta">ETA (optional)</Label>
-              <Input
-                id="nsEta"
-                placeholder="Oct 12"
-                value={form.eta}
-                onChange={(e) => setForm({ ...form, eta: e.target.value })}
-              />
+              <Input id="nsEta" placeholder="Oct 12" value={form.eta} onChange={(e) => setForm({ ...form, eta: e.target.value })} />
             </div>
           </div>
-                    <div className="grid gap-2">
-            <Label htmlFor="nsGoods">Goods</Label>
-            <Input
-              id="nsGoods"
-              placeholder="What is being shipped"
-              value={form.goods}
-              onChange={(e) => setForm({ ...form, goods: e.target.value })}
-            />
-          </div>
+
           <div className="grid gap-2">
-            <Label htmlFor="nsAddress">Delivery address</Label>
-            <Input
-              id="nsAddress"
-              placeholder="Street, city"
-              value={form.deliveryAddress}
-              onChange={(e) => setForm({ ...form, deliveryAddress: e.target.value })}
-            />
+            <Label htmlFor="nsGoods">General Goods Note</Label>
+            <Input id="nsGoods" placeholder="General description" value={form.goods} onChange={(e) => setForm({ ...form, goods: e.target.value })} />
           </div>
+
           <div className="grid grid-cols-2 gap-4">
+             <div className="grid gap-2">
+              <Label htmlFor="nsAddress">Delivery address</Label>
+              <Input id="nsAddress" placeholder="Street, city" value={form.deliveryAddress} onChange={(e) => setForm({ ...form, deliveryAddress: e.target.value })} />
+            </div>
             <div className="grid gap-2">
               <Label htmlFor="nsAmount">Amount</Label>
-              <Input
-                id="nsAmount"
-                placeholder="100"
-                value={form.amount}
-                onChange={(e) => setForm({ ...form, amount: e.target.value })}
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="nsTime">Delivery time</Label>
-              <Input
-                id="nsTime"
-                placeholder="2026-10-10 15:00"
-                value={form.deliveryTime}
-                onChange={(e) => setForm({ ...form, deliveryTime: e.target.value })}
-              />
+              <Input id="nsAmount" placeholder="100" value={form.amount} onChange={(e) => setForm({ ...form, amount: e.target.value })} />
             </div>
           </div>
-          <Button type="submit" disabled={create.isPending}>
+
+          <div className="border-t pt-4 mt-2">
+            <h3 className="text-sm font-semibold mb-4 text-muted-foreground">Detailed Shipment Info (For Tracking Page)</h3>
+            <div className="grid grid-cols-2 gap-4 mb-4">
+              <div className="grid gap-2">
+                <Label>Mode of transport</Label>
+                <Input placeholder="Air freight (flight)" value={form.modeOfTransport} onChange={(e) => setForm({ ...form, modeOfTransport: e.target.value })} />
+              </div>
+              <div className="grid gap-2">
+                <Label>Consignee EORI number</Label>
+                <Input placeholder="Not applicable" value={form.consigneeEori} onChange={(e) => setForm({ ...form, consigneeEori: e.target.value })} />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4 mb-4">
+              <div className="grid gap-2">
+                <Label>Airport of departure</Label>
+                <Input placeholder="LAX, Los Angeles" value={form.departureAirport} onChange={(e) => setForm({ ...form, departureAirport: e.target.value })} />
+              </div>
+              <div className="grid gap-2">
+                <Label>Airport of destination</Label>
+                <Input placeholder="LEJ, Leipzig" value={form.destinationAirport} onChange={(e) => setForm({ ...form, destinationAirport: e.target.value })} />
+              </div>
+            </div>
+            <div className="grid gap-2">
+              <Label>Final delivery address</Label>
+              <Input placeholder="Dr. Külz-Ufer 14, 04860 Torgau" value={form.finalDeliveryAddress} onChange={(e) => setForm({ ...form, finalDeliveryAddress: e.target.value })} />
+            </div>
+          </div>
+
+          <div className="border-t pt-4 mt-2">
+            <h3 className="text-sm font-semibold mb-4 text-muted-foreground">Vehicle Info (Optional)</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label>Vehicle Model</Label>
+                <Input placeholder="Tesla Model S Plaid, 2023" value={form.vehicleName} onChange={(e) => setForm({ ...form, vehicleName: e.target.value })} />
+              </div>
+              <div className="grid gap-2">
+                <Label>VIN</Label>
+                <Input placeholder="5YJSA1E6XPF_____" value={form.vehicleVin} onChange={(e) => setForm({ ...form, vehicleVin: e.target.value })} />
+              </div>
+              <div className="grid gap-2">
+                <Label>HS Code</Label>
+                <Input placeholder="8703.80.00" value={form.vehicleHsCode} onChange={(e) => setForm({ ...form, vehicleHsCode: e.target.value })} />
+              </div>
+              <div className="grid gap-2">
+                <Label>Origin</Label>
+                <Input placeholder="USA (Fremont)" value={form.vehicleOrigin} onChange={(e) => setForm({ ...form, vehicleOrigin: e.target.value })} />
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t pt-4 mt-2">
+            <h3 className="text-sm font-semibold mb-4 text-muted-foreground">Gold / Jewelry Info (Optional)</h3>
+            <div className="grid grid-cols-2 gap-4 mb-4">
+              <div className="grid gap-2">
+                <Label>Investment gold</Label>
+                <Input placeholder="Bars / plates / coins, purity ≥ 995" value={form.goldInvestment} onChange={(e) => setForm({ ...form, goldInvestment: e.target.value })} />
+              </div>
+              <div className="grid gap-2">
+                <Label>Gold jewelry</Label>
+                <Input placeholder="Necklace / ring / bracelet" value={form.goldJewelry} onChange={(e) => setForm({ ...form, goldJewelry: e.target.value })} />
+              </div>
+              <div className="grid gap-2">
+                <Label>Customs tariff no.</Label>
+                <Input placeholder="HS 7113.19.00.00" value={form.customsTariffNo} onChange={(e) => setForm({ ...form, customsTariffNo: e.target.value })} />
+              </div>
+              <div className="grid gap-2">
+                <Label>Exact total weight</Label>
+                <Input placeholder="90.1 g" value={form.exactWeight} onChange={(e) => setForm({ ...form, exactWeight: e.target.value })} />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="grid gap-2">
+                <Label>Declared total value</Label>
+                <Input placeholder="USD 12,098.91" value={form.declaredValue} onChange={(e) => setForm({ ...form, declaredValue: e.target.value })} />
+              </div>
+              <div className="grid gap-2">
+                <Label>Payment status</Label>
+                <Input placeholder="PAID" value={form.paymentStatus} onChange={(e) => setForm({ ...form, paymentStatus: e.target.value })} />
+              </div>
+            </div>
+          </div>
+
+          <Button type="submit" className="mt-4" disabled={create.isPending}>
             {create.isPending ? "Creating…" : "Create & generate tracking code"}
           </Button>
         </form>
