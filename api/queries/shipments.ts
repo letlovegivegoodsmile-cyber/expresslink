@@ -32,10 +32,23 @@ export async function createShipment(data: {
   destination: string;
   mode: string;
   eta?: string;
-    goods?: string;
+  goods?: string;
   deliveryAddress?: string;
   amount?: string;
   deliveryTime?: string;
+  // New fields
+  modeOfTransport?: string;
+  departureAirport?: string;
+  destinationAirport?: string;
+  finalDeliveryAddress?: string;
+  consigneeEori?: string;
+  vehicles?: { vehicle: string; vin: string; hsCode: string; origin: string }[];
+  goldInvestment?: string;
+  goldJewelry?: string;
+  customsTariffNo?: string;
+  exactWeight?: string;
+  declaredValue?: string;
+  paymentStatus?: string;
 }): Promise<ShipmentWithEvents> {
   const db = getDb();
   const [{ id }] = await db
