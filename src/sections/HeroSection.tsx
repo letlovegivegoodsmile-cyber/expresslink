@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { trpc } from "@/providers/trpc";
 import { Stars } from "@/components/site/Stars";
 import {
@@ -48,7 +49,7 @@ function TrackWidget() {
       setResult(data);
     } catch {
       setError(
-        "No shipment found for that number. Check the code and try again — or ask us for a demo code.",
+        "No shipment found for that number. Check the code and try again.",
       );
     } finally {
       setLoading(false);
@@ -99,6 +100,81 @@ function TrackWidget() {
               {result.eta ? ` · ETA ${result.eta}` : ""}
             </span>
           </div>
+
+          {/* --- START OF DYNAMIC TABLES --- */}
+          <div className="shipment-details-wrapper" style={{ marginTop: '20px', textAlign: 'left' }}>
+            
+            {/* 1. Shipment Details Table */}
+            <h3 className="table-title">Shipment Details</h3>
+            <table className="tracking-table">
+              <tbody>
+                <tr><td>Mode of transport</td><td>{result.modeOfTransport || '—'}</td></tr>
+                <tr><td>Airport of departure</td><td>{result.departureAirport || '—'}</td></tr>
+                <tr><td>Airport of destination</td><td>{result.destinationAirport || '—'}</td></tr>
+                <tr><td>Final delivery address</td><td>{result.finalDeliveryAddress || '—'}</td></tr>
+                <tr><td>Consignee EORI number</td><td>{result.consigneeEori || 'Not applicable'}</td></tr>
+              </tbody>
+            </table>
+
+            {/* 2. Vehicles Table */}
+            {result.vehicles && result.vehicles.length > 0 && (
+              <>
+                <h3 className="table-title">Goods — Vehicles ({result.vehicles.length}x)</h3>
+                <table className="tracking-table">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Vehicle</th>
+                      <th>VIN</th>
+                      <th>HS Code</th>
+                      <th>Origin</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {result.vehicles.map((v: any, i: number) => (
+                      <tr key={i}>
+                        <td>{i + 1}</td>
+                        <td>{v.vehicle}</td>
+                        <td>{v.vin}</td>
+                        <td>{v.hsCode}</td>
+                        <td>{v.origin}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </>
+            )}
+
+            {/* 3. Gold / Jewelry Table */}
+            {(result.goldInvestment || result.goldJewelry) && (
+              <>
+                <h3 className="table-title">Goods — Gold / Jewelry</h3>
+                <table className="tracking-table">
+                  <tbody>
+                    {result.goldInvestment && <tr><td>Investment gold</td><td>{result.goldInvestment}</td></tr>}
+                    {result.goldJewelry && <tr><td>Gold jewelry</td><td>{result.goldJewelry}</td></tr>}
+                    <tr><td>Customs tariff no.</td><td>{result.customsTariffNo || '—'}</td></tr>
+                    <tr><td>Exact total weight</td><td>{result.exactWeight || '—'}</td></tr>
+                    <tr><td>Declared total value</td><td>{result.declaredValue || '—'}</td></tr>
+                    <tr><td>Payment status</td><td className="paid-text">{result.paymentStatus || '—'}</td></tr>
+                  </tbody>
+                </table>
+              </>
+            )}
+
+            {/* 4. General Notes */}
+            {result.goods && (
+              <>
+                <h3 className="table-title">Additional Notes</h3>
+                <div style={{ padding: '15px', border: '1px solid #d1d5db', background: '#fff', marginBottom: '20px', color: '#333' }}>
+                  {result.goods}
+                </div>
+              </>
+            )}
+
+          </div>
+          {/* --- END OF DYNAMIC TABLES --- */}
+
           {result.events.length > 0 && (
             <div className="track-events">
               {[...result.events]
